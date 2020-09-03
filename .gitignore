@@ -1,0 +1,4 @@
+myCreds.py
+test_json_data.json
+*.pyc
+.vscode/settings.json
