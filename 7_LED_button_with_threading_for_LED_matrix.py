@@ -118,7 +118,7 @@ class CallBack:
 
         i = 0
         while True:
-            if i % 60 == 0:  # alternative way to execute every 60 sec
+            if i % 300 == 0:  # alternative way to execute every 5 min
                 # was to call bus info ('gray'), display pattern
                 # busInfoHandler.getInfoAndSendItToSerial2('gray')
                 # call googleDirections

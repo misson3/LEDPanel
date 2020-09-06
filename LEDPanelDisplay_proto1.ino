@@ -30,6 +30,10 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false, 64);
 // {"haya2":[1, "+1879d", "251571.33", "x1000 km"]}
 // {"red":[1, "Halting...", "Bye."]}
 
+// {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
+// {'route': [1, ['RouteNow', 'r1'], [min, summary], [99, NA], [99, NA], time]}
+
+
 void setup() {
   // Serial
   Serial.begin(9600);
@@ -59,10 +63,15 @@ void loop() {
     // clear matrix
     matrix.fillScreen(matrix.Color333(0, 0, 0));
 
+    // not very beautiful here...
+    // some will be undef
+    // if this is python, it will give an error
     int bus = doc["bus"][0];
     String disp = doc["bus"][2];  // ------------------- Feb23
     int haya2 = doc["haya2"][0];
     int red = doc["red"][0];
+    int route = doc["route"][0];  // ----- Sep06, 2020
+
     if (bus == 1) {
       Serial.println("json for bus arrival");
       displayBus(doc);
@@ -76,6 +85,9 @@ void loop() {
     } else if (red == 1) {
       Serial.println("red.  halting message");
       displayRed(doc);
+    } else if (route == 1) {  // ----- Sep06, 2020
+      Serial.println("json for routes with google Directions API");
+      displayRoute(doc);
     } else {
       Serial.println("not bus info");
       displayNoInfo();
@@ -343,6 +355,36 @@ void displayRed(DynamicJsonDocument doc) {
 }
 
 
+void displayRoute(DynamicJsonDocument doc) {
+  // {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
+  String banner1 = doc['route'][1][0];  // RouteNow
+  String banner2 = doc['route'][1][1];  // r1
+  String time1 = doc['route'][2][0];
+  // String summary1 = doc['route'][2][1];
+  String time2 = doc['route'][3][0];
+  // String summary2 = doc['route'][3][0];
+  String time3 = doc['route'][4][0];
+  // String summary3 = doc['route'][4][0];
+  String ts = doc['route'][5];  // time
+
+  // display
+  // Line 1-1
+  matrix.setCursor(1, 0);
+  matrix.setTextColor(matrix.Color333(3, 3, 3)); // bus stop, white
+  matrix.println(banner1);
+  // Line 1-2
+  matrix.setCursor(51, 0);
+  matrix.setTextColor(matrix.Color333(3, 0, 6)); // bus line num, red-purple
+  matrix.println(banner2);
+
+  // try bigger size
+  matrix.setTextSize(2);
+  matrix.setCursor(6, 8);
+  matrix.setTextColor(matrix.Color333(0, 5, 0));
+  matrix.println('21, 25, 26')
+}
+
+
 uint16_t statusColor(String col) {
   if (col == "G") {
     return matrix.Color333(0, 5, 0); // Green
@@ -356,3 +398,4 @@ uint16_t statusColor(String col) {
     return matrix.Color333(1, 1, 1); // weak white for now
   }
 }
+

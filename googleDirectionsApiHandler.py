@@ -3,7 +3,7 @@
 
 import datetime
 import json
-# import serial
+import serial
 import time
 import urllib.request
 
@@ -19,6 +19,11 @@ credict = myCreds.myc()
 #     json_string = json.dumps(info_dict) + '\n'
 #     ser.write(json_string.encode())
 #     ser.close()
+
+
+def timeStamp():
+    now = datetime.datetime.now()
+    return now.strftime('%H:%M')
 
 
 def getInfoAndSendItToSerial2(route):
@@ -46,9 +51,31 @@ def getInfoAndSendItToSerial2(route):
 
         # print(res_dict)
 
-        for d in res_dict['routes']:
-            print(d['legs'][0]['duration_in_traffic']['text'])
-            print(d['summary'])
+        # {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
+        info_dict = {'route': [
+                                1,
+                                ['RouteNow', 'r1'],
+                                [99, 'NA'],
+                                [99, 'NA'],
+                                [99, 'NA'],
+                                timeStamp()
+                               ]
+                     }
+
+        for i, d in enumerate(res_dict['routes']):
+            time = d['legs'][0]['duration_in_traffic']['text']
+            summary = d['summary']
+            info_dict['route'][i+2][0] = time
+            info_dict['route'][i+2][1] = summary
+
+        print(info_dict)
+
+        # send the dict to serial
+        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
+        time.sleep(2)
+        json_string = json.dumps(info_dict) + '\n'
+        ser.write(json_string.encode())
+        ser.close()
 
 
 if __name__ == '__main__':
