@@ -12,29 +12,18 @@ import myCreds  # my
 
 credict = myCreds.myc()
 
-# def sendToSerial(info_dict):
-#     # send the dict to serial
-#     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
-#     time.sleep(2)
-#     json_string = json.dumps(info_dict) + '\n'
-#     ser.write(json_string.encode())
-#     ser.close()
-
 
 def timeStamp():
     now = datetime.datetime.now()
     return now.strftime('%H:%M')
 
 
-def getInfoAndSendItToSerial2(route):
-    key = credict['api_key']
-    ori, dest = credict[route]
-
+def getEstimations(key, point1, point2):
     # url construction
     # API  parameters
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
-    url += 'origin=place_id:' + ori
-    url += '&destination=place_id:' + dest
+    url += 'origin=place_id:' + point1
+    url += '&destination=place_id:' + point2
     url += '&mode=driving&departure_time=now&alternatives=true'
     url += '&key=' + key
 
@@ -49,34 +38,62 @@ def getInfoAndSendItToSerial2(route):
         # print(type(decoded_body1_loadsed))  # dict
         res_dict = json.loads(decoded_body1)
 
-        # print(res_dict)
-
-        # {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
-        info_dict = {"route": [
-                                1,
-                                ["RouteNow", "r1"],
-                                ["--", "NA"],
-                                ["--", "NA"],
-                                ["--", "NA"],
-                                timeStamp()
-                               ]
-                     }
-
+        estimations = []
+        summaries = []
         for i, d in enumerate(res_dict['routes']):
-            duration = d['legs'][0]['duration_in_traffic']['text']
-            duration = duration.split(' ')[0]
+            estimation = d['legs'][0]['duration_in_traffic']['text']
+            estimation = estimation.split(' ')[0]
             summary = d['summary']
-            info_dict["route"][i+2][0] = duration
-            info_dict["route"][i+2][1] = summary
+            estimations.append(estimation)
+            summaries.append(summary)
 
-        print(info_dict)
+    return estimations, summaries
 
-        # send the dict to serial
-        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
-        time.sleep(2)
-        json_string = json.dumps(info_dict) + '\n'
-        ser.write(json_string.encode())
-        ser.close()
+
+def getInfoAndSendItToSerial2(routes):
+    # for now, routes = ('r1', 'r2')
+    key = credict['api_key']
+    ori, dest1 = credict[routes[0]]
+    dest1, dest2 = credict[routes[1]]
+
+    estTimes1, summaries1 = getEstimations(key, ori, dest1)
+    time.sleep(3)
+    estTimes2, summaries2 = getEstimations(key, dest1, dest2)
+
+    # {'route': [1,
+    # ['RouteNow', 'r1'],
+    # [min, summary], [min, summary], [min, summary],
+    # [min, summary], [min, summary], [min, summary],
+    # time]}
+    info_dict = {"route": [
+                            1,
+                            ["RouteNow", "r1"],
+                            # r1
+                            ["--", "--"],
+                            ["--", "--"],
+                            ["--", "--"],
+                            # r2
+                            ["--", "--"],
+                            ["--", "--"],
+                            ["--", "--"],
+                            timeStamp()
+                            ]
+                }
+
+    for i in range(len(estTimes1)):
+        info_dict["route"][i+2][0] = estTimes1[i]
+        info_dict["route"][i+2][1] = summaries1[i]
+        info_dict["route"][i+5][0] = estTimes2[i]
+        info_dict["route"][i+5][1] = summaries2[i]
+
+    print(info_dict)
+
+    # send the dict to serial
+    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
+    time.sleep(2)
+    json_string = json.dumps(info_dict) + '\n'
+    ser.write(json_string.encode())
+    ser.close()
 
 
 if __name__ == '__main__':

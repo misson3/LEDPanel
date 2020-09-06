@@ -1,3 +1,5 @@
+// Sep06, 2020: google Directions display (routeNow) added!
+
 //Jan25, 2020, ms
 //Feb09, 2020, ms  # 3 bus stops
 //Feb15, 2020, ms  # add long line to connector line.  change rules
@@ -30,9 +32,8 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false, 64);
 // {"haya2":[1, "+1879d", "251571.33", "x1000 km"]}
 // {"red":[1, "Halting...", "Bye."]}
 
-// {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
-// {'route': [1, ['RouteNow', 'r1'], [min, summary], [99, NA], [99, NA], time]}
-// {'route': [1, ['RouteNow', 'r1'], [25, 'NA'], [29, 'NA'], [30, 'NA'], '24:59']}
+
+// {"route": [1, ["RouteNow", "r1"], [25, "--"], [29, "--"], [30, "--"], [20, "--"], [21, "--"], [22, "--"], "24:59"]}
 
 void setup() {
   // Serial
@@ -356,21 +357,27 @@ void displayRed(DynamicJsonDocument doc) {
 
 
 void displayRoute(DynamicJsonDocument doc) {
-  // {"route": [1, ["RouteNow", "r1"], [25, "BKE"], [29, "WL"], ["--", "NA"], "24:59"]}
+  // {'route': [1,
+  //            ['RouteNow', 'r1'],
+  //            [min, summary], [min, summary], [min, summary],
+  //            [min, summary], [min, summary], [min, summary],
+  //            time]
+  // }
   String banner1 = doc["route"][1][0];  // RouteNow
   String banner2 = doc["route"][1][1];  // r1
   String t1 = doc["route"][2][0];
-  // String summary1 = doc["route"][2][1];
   String t2 = doc["route"][3][0];
-  // String summary2 = doc["route"][3][0];
   String t3 = doc["route"][4][0];
-  // String summary3 = doc["route"][4][0];
-  String ts = doc["route"][5];  // time
+  String t4 = doc["route"][5][0];
+  String t5 = doc["route"][6][0];
+  String t6 = doc["route"][7][0];
+
+  String ts = doc["route"][8];  // time
 
   // display
   // Line 1-1
   matrix.setCursor(1, 0);
-  matrix.setTextColor(matrix.Color333(3, 3, 3)); // bus stop, white
+  matrix.setTextColor(matrix.Color333(5, 5, 3)); // bus stop, white
   matrix.println(banner1);
   // Line 1-2
   matrix.setCursor(51, 0);
@@ -379,14 +386,17 @@ void displayRoute(DynamicJsonDocument doc) {
 
   // try bigger size
   // matrix.setTextSize(1);  // 2 is too big
-  matrix.setCursor(3, 12);
+  matrix.setCursor(3, 8);
   matrix.setTextColor(matrix.Color333(0, 5, 0));
   matrix.println(t1 + ", " + t2 + ", " + t3);
+  matrix.setCursor(3, 16);
+  matrix.setTextColor(matrix.Color333(0, 2, 5));
+  matrix.println(t4 + ", " + t5 + ", " + t6);
 
   matrix.setCursor(33, 24);
-  matrix.setTextColor(matrix.Color333(5, 5, 0));
+  matrix.setTextColor(matrix.Color333(5, 5, 3));
   matrix.println(ts);
-  
+
 }
 
 
