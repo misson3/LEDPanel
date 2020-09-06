@@ -32,7 +32,7 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false, 64);
 
 // {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
 // {'route': [1, ['RouteNow', 'r1'], [min, summary], [99, NA], [99, NA], time]}
-
+// {'route': [1, ['RouteNow', 'r1'], [25, 'NA'], [29, 'NA'], [30, 'NA'], '24:59']}
 
 void setup() {
   // Serial
@@ -356,16 +356,16 @@ void displayRed(DynamicJsonDocument doc) {
 
 
 void displayRoute(DynamicJsonDocument doc) {
-  // {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
-  String banner1 = doc['route'][1][0];  // RouteNow
-  String banner2 = doc['route'][1][1];  // r1
-  String time1 = doc['route'][2][0];
-  // String summary1 = doc['route'][2][1];
-  String time2 = doc['route'][3][0];
-  // String summary2 = doc['route'][3][0];
-  String time3 = doc['route'][4][0];
-  // String summary3 = doc['route'][4][0];
-  String ts = doc['route'][5];  // time
+  // {"route": [1, ["RouteNow", "r1"], [25, "BKE"], [29, "WL"], ["--", "NA"], "24:59"]}
+  String banner1 = doc["route"][1][0];  // RouteNow
+  String banner2 = doc["route"][1][1];  // r1
+  String t1 = doc["route"][2][0];
+  // String summary1 = doc["route"][2][1];
+  String t2 = doc["route"][3][0];
+  // String summary2 = doc["route"][3][0];
+  String t3 = doc["route"][4][0];
+  // String summary3 = doc["route"][4][0];
+  String ts = doc["route"][5];  // time
 
   // display
   // Line 1-1
@@ -378,10 +378,15 @@ void displayRoute(DynamicJsonDocument doc) {
   matrix.println(banner2);
 
   // try bigger size
-  matrix.setTextSize(2);
-  matrix.setCursor(6, 8);
+  // matrix.setTextSize(1);  // 2 is too big
+  matrix.setCursor(3, 12);
   matrix.setTextColor(matrix.Color333(0, 5, 0));
-  matrix.println('21, 25, 26')
+  matrix.println(t1 + ", " + t2 + ", " + t3);
+
+  matrix.setCursor(33, 24);
+  matrix.setTextColor(matrix.Color333(5, 5, 0));
+  matrix.println(ts);
+  
 }
 
 
@@ -398,4 +403,3 @@ uint16_t statusColor(String col) {
     return matrix.Color333(1, 1, 1); // weak white for now
   }
 }
-

@@ -52,21 +52,22 @@ def getInfoAndSendItToSerial2(route):
         # print(res_dict)
 
         # {'route': [1, ['RouteNow', 'r1'], [min, summary], [min, summary], [min, summary], time]}
-        info_dict = {'route': [
+        info_dict = {"route": [
                                 1,
-                                ['RouteNow', 'r1'],
-                                [99, 'NA'],
-                                [99, 'NA'],
-                                [99, 'NA'],
+                                ["RouteNow", "r1"],
+                                ["--", "NA"],
+                                ["--", "NA"],
+                                ["--", "NA"],
                                 timeStamp()
                                ]
                      }
 
         for i, d in enumerate(res_dict['routes']):
-            time = d['legs'][0]['duration_in_traffic']['text']
+            duration = d['legs'][0]['duration_in_traffic']['text']
+            duration = duration.split(' ')[0]
             summary = d['summary']
-            info_dict['route'][i+2][0] = time
-            info_dict['route'][i+2][1] = summary
+            info_dict["route"][i+2][0] = duration
+            info_dict["route"][i+2][1] = summary
 
         print(info_dict)
 

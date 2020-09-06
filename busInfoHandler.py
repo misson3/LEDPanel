@@ -163,7 +163,7 @@ def getInfoAndSendItToSerial2(gray_or_green):
     #              ['Ar', 'G', '15', 'Y', '18', 'R'],  # Before: RIGHT
     #              ['03', 'O', '09', 'G', '14', 'Y'],  # After: LEFT
     #              ['slash2', 'dash3']]}  # // or ---
-    bus_service = credict['bus_service1']
+    bus_service = credict['bus_service']
     if gray_or_green == 'gray':
         pred_L = getBusInfo(credict['stop1'], bus_service)
         pred_C = getBusInfo(credict['stop0'], bus_service)
