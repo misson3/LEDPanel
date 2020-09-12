@@ -357,45 +357,36 @@ void displayRed(DynamicJsonDocument doc) {
 
 
 void displayRoute(DynamicJsonDocument doc) {
-  // {'route': [1,
-  //            ['RouteNow', 'r1'],
-  //            [min, summary], [min, summary], [min, summary],
-  //            [min, summary], [min, summary], [min, summary],
-  //            time]
-  // }
+  // {"route": [1, ["RouteNow", "r1"], "1:18,18", "2:13,16,17", "14:39"]}
   String banner1 = doc["route"][1][0];  // RouteNow
   String banner2 = doc["route"][1][1];  // r1
-  String t1 = doc["route"][2][0];
-  String t2 = doc["route"][3][0];
-  String t3 = doc["route"][4][0];
-  String t4 = doc["route"][5][0];
-  String t5 = doc["route"][6][0];
-  String t6 = doc["route"][7][0];
-
-  String ts = doc["route"][8];  // time
+  String row2 = doc["route"][2];
+  String row3 = doc["route"][3];
+  String row4 = doc["route"][4];
 
   // display
-  // Line 1-1
+  // row 1-1
   matrix.setCursor(1, 0);
   matrix.setTextColor(matrix.Color333(5, 5, 3)); // bus stop, white
   matrix.println(banner1);
-  // Line 1-2
+  // row 1-2
   matrix.setCursor(51, 0);
   matrix.setTextColor(matrix.Color333(3, 0, 6)); // bus line num, red-purple
   matrix.println(banner2);
 
   // try bigger size
   // matrix.setTextSize(1);  // 2 is too big
-  matrix.setCursor(3, 8);
-  matrix.setTextColor(matrix.Color333(0, 5, 0));
-  matrix.println(t1 + ", " + t2 + ", " + t3);
-  matrix.setCursor(3, 16);
-  matrix.setTextColor(matrix.Color333(0, 2, 5));
-  matrix.println(t4 + ", " + t5 + ", " + t6);
+  matrix.setCursor(2, 8);
+  matrix.setTextColor(matrix.Color333(0, 3, 7));
+  matrix.println(row2);
 
-  matrix.setCursor(33, 24);
+  matrix.setCursor(2, 16);
+  matrix.setTextColor(matrix.Color333(0, 6, 4));
+  matrix.println(row3);
+
+  matrix.setCursor(34, 24);
   matrix.setTextColor(matrix.Color333(5, 5, 3));
-  matrix.println(ts);
+  matrix.println(row4);
 
 }
 

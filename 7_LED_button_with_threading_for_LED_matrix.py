@@ -122,8 +122,8 @@ class CallBack:
                 # was to call bus info ('gray'), display pattern
                 # busInfoHandler.getInfoAndSendItToSerial2('gray')
                 # call googleDirections
-                googleDirectionsApiHandler.getInfoAndSendItToSerial2(('r1',
-                                                                      'r2'))
+                googleDirectionsApiHandler.getInfoAndSendItToSerial2(('s1',
+                                                                      's2'))
 
             time.sleep(1)
             i += 1

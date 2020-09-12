@@ -40,18 +40,20 @@ def getEstimations(key, point1, point2):
 
         estimations = []
         summaries = []
-        for i, d in enumerate(res_dict['routes']):
+        for d in res_dict['routes']:
             estimation = d['legs'][0]['duration_in_traffic']['text']
             estimation = estimation.split(' ')[0]
             summary = d['summary']
             estimations.append(estimation)
             summaries.append(summary)
+    # print('estimations', estimations)
+    # print('summaries', summaries)
 
     return estimations, summaries
 
 
 def getInfoAndSendItToSerial2(routes):
-    # for now, routes = ('r1', 'r2')
+    # for now, routes = ('s1', 's2')  # stretch(stop)1, stretch(stop)2
     key = credict['api_key']
     ori, dest1 = credict[routes[0]]
     dest1, dest2 = credict[routes[1]]
@@ -60,31 +62,15 @@ def getInfoAndSendItToSerial2(routes):
     time.sleep(3)
     estTimes2, summaries2 = getEstimations(key, dest1, dest2)
 
-    # {'route': [1,
-    # ['RouteNow', 'r1'],
-    # [min, summary], [min, summary], [min, summary],
-    # [min, summary], [min, summary], [min, summary],
-    # time]}
-    info_dict = {"route": [
-                            1,
-                            ["RouteNow", "r1"],
-                            # r1
-                            ["--", "--"],
-                            ["--", "--"],
-                            ["--", "--"],
-                            # r2
-                            ["--", "--"],
-                            ["--", "--"],
-                            ["--", "--"],
-                            timeStamp()
-                            ]
-                }
+    # === I KNOW summaries ARE NOT USES ===
+    # === LEAVE IT FOR NEXT VERSION ===
 
-    for i in range(len(estTimes1)):
-        info_dict["route"][i+2][0] = estTimes1[i]
-        info_dict["route"][i+2][1] = summaries1[i]
-        info_dict["route"][i+5][0] = estTimes2[i]
-        info_dict["route"][i+5][1] = summaries2[i]
+    row_1 = ["RouteNow", "r1"]
+    row_2 = "1:" + ','.join(estTimes1)
+    row_3 = "2:" + ','.join(estTimes2)
+    row_4 = timeStamp()
+
+    info_dict = {"route": [1, row_1, row_2, row_3, row_4]}
 
     print(info_dict)
 
@@ -97,5 +83,11 @@ def getInfoAndSendItToSerial2(routes):
 
 
 if __name__ == '__main__':
-    getInfoAndSendItToSerial2('r1')
+    getInfoAndSendItToSerial2(('s1', 's2'))
+    #
+    #key = credict['api_key']
+    #ori, dest1 = credict['s1']
+    #dest1, dest2 = credict['s2']
+    #getEstimations(key, ori, dest1)
+    #getEstimations(key, dest1, dest2)
     # pass
