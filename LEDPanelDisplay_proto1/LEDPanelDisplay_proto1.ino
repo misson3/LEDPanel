@@ -373,6 +373,10 @@ void displayRoute(DynamicJsonDocument doc) {
   matrix.setCursor(51, 0);
   matrix.setTextColor(matrix.Color333(3, 0, 6)); // bus line num, red-purple
   matrix.println(banner2);
+  // or row 4 top
+  // matrix.setCursor(1, 24); 
+  // matrix.setTextColor(matrix.Color333(3, 0, 6)); // bus line num, red-purple
+  // matrix.println(banner2);
 
   // try bigger size
   // matrix.setTextSize(1);  // 2 is too big

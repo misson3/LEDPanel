@@ -3,7 +3,7 @@
 
 import datetime
 import json
-import serial
+#import serial
 import time
 import urllib.request
 
@@ -16,6 +16,34 @@ credict = myCreds.myc()
 def timeStamp():
     now = datetime.datetime.now()
     return now.strftime('%H:%M')
+
+
+def timeStampFull():
+    now = datetime.datetime.now()
+    return now.strftime('%d%b%Y-%H:%M:%S')
+
+
+def writeLog(t1, s1, t2, s2):
+    log_file = './googleDirections_log1.csv'
+    # fill element if the lists are shorter
+    # t1 and s1, t2 and s2 should have the same lengths
+    for _ in range(3 - len(t1)):
+        t1.append('')  # just append blank
+        s1.append('')
+    # do the same for the set 2
+    for _ in range(3 - len(t2)):
+        t2.append('')  # just append blank
+        s2.append('')
+
+    # print
+    # full ts, ts, t1 (3 cells), s1 (3 cells), t2 (3 cells), s2 (3 cells)
+    # line construction
+    line = [timeStampFull(), timeStamp()]
+    for list_ in (t1, s1, t2, s2):
+        line.append('\t'.join(list_))
+
+    with open(log_file, mode='a') as LOG:
+        LOG.write('\t'.join(line))
 
 
 def getEstimations(key, point1, point2):
@@ -46,28 +74,33 @@ def getEstimations(key, point1, point2):
             summary = d['summary']
             estimations.append(estimation)
             summaries.append(summary)
-    # print('estimations', estimations)
-    # print('summaries', summaries)
+    print('estimations', estimations)
+    print('summaries', summaries)
 
     return estimations, summaries
 
 
-def getInfoAndSendItToSerial2(routes):
-    # for now, routes = ('s1', 's2')  # stretch(stop)1, stretch(stop)2
+def getInfoAndSendItToSerial2(routes, heads):
+    # for now, routes = ('s1', 's2')
+    # # stretch(stop)1, stretch(stop)2
     key = credict['api_key']
-    ori, dest1 = credict[routes[0]]
-    dest1, dest2 = credict[routes[1]]
+    ori1, dest1 = credict[routes[0]]
+    ori2, dest2 = credict[routes[1]]
 
-    estTimes1, summaries1 = getEstimations(key, ori, dest1)
+    estTimes1, summaries1 = getEstimations(key, ori1, dest1)
     time.sleep(3)
-    estTimes2, summaries2 = getEstimations(key, dest1, dest2)
+    estTimes2, summaries2 = getEstimations(key, ori2, dest2)
+
+    # take a log (now, the file name is fixed)
+    writeLog(estTimes1, summaries1, estTimes2, summaries2)
 
     # === I KNOW summaries ARE NOT USES ===
     # === LEAVE IT FOR NEXT VERSION ===
 
-    row_1 = ["RouteNow", "r1"]
-    row_2 = "1:" + ','.join(estTimes1)
-    row_3 = "2:" + ','.join(estTimes2)
+    # row_1 = ["RouteNow", "r1"]
+    row_1 = ["DriveNow", "t1"]
+    row_2 = heads[0] + ','.join(estTimes1)
+    row_3 = heads[1] + ','.join(estTimes2)
     row_4 = timeStamp()
 
     info_dict = {"route": [1, row_1, row_2, row_3, row_4]}
@@ -75,15 +108,16 @@ def getInfoAndSendItToSerial2(routes):
     print(info_dict)
 
     # send the dict to serial
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
-    time.sleep(2)
-    json_string = json.dumps(info_dict) + '\n'
-    ser.write(json_string.encode())
-    ser.close()
+    # ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
+    # time.sleep(2)
+    # json_string = json.dumps(info_dict) + '\n'
+    # ser.write(json_string.encode())
+    # ser.close()
 
 
 if __name__ == '__main__':
-    getInfoAndSendItToSerial2(('s1', 's2'))
+    # getInfoAndSendItToSerial2(('s1', 's2'))
+    getInfoAndSendItToSerial2(('s3', 's4'), ('B:', 'L:'))
     #
     #key = credict['api_key']
     #ori, dest1 = credict['s1']

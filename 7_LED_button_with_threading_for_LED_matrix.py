@@ -45,9 +45,9 @@ class CallBack:
         GPIO.add_event_callback(self.green_btn_pin, self.setProgramStatus)
         GPIO.add_event_callback(self.red_btn_pin, self.setProgramStatus)
         # initialize program status: keep only 1 is active all the time
-        self.gray_active = 0
+        self.gray_active = 1
         self.blue_active = 0
-        self.green_active = 1
+        self.green_active = 0
         self.red_active = 0
 
         # LED pin setup
@@ -122,8 +122,9 @@ class CallBack:
                 # was to call bus info ('gray'), display pattern
                 # busInfoHandler.getInfoAndSendItToSerial2('gray')
                 # call googleDirections
-                googleDirectionsApiHandler.getInfoAndSendItToSerial2(('s1',
-                                                                      's2'))
+                a1 = ('s3', 's4')
+                a2 = ('B:', 'L:')
+                googleDirectionsApiHandler.getInfoAndSendItToSerial2(a1, a2)
 
             time.sleep(1)
             i += 1
