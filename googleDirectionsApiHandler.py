@@ -3,7 +3,7 @@
 
 import datetime
 import json
-#import serial
+import serial
 import time
 import urllib.request
 
@@ -43,7 +43,7 @@ def writeLog(t1, s1, t2, s2):
         line.append('\t'.join(list_))
 
     with open(log_file, mode='a') as LOG:
-        LOG.write('\t'.join(line))
+        LOG.write('\t'.join(line) + '\n')
 
 
 def getEstimations(key, point1, point2):
@@ -94,8 +94,15 @@ def getInfoAndSendItToSerial2(routes, heads):
     # take a log (now, the file name is fixed)
     writeLog(estTimes1, summaries1, estTimes2, summaries2)
 
-    # === I KNOW summaries ARE NOT USES ===
-    # === LEAVE IT FOR NEXT VERSION ===
+    # '' is added when the length of the list is not 3 in
+    # writeLog()
+    # because what I use is passing reference, it comes back
+    # here and line display could be "16, 18,"
+    # remove it again
+    for _ in range(estTimes1.count('')):
+        estTimes1.remove('')
+    for _ in range(estTimes2.count('')):
+        estTimes2.remove('')
 
     # row_1 = ["RouteNow", "r1"]
     row_1 = ["DriveNow", "t1"]
@@ -108,11 +115,11 @@ def getInfoAndSendItToSerial2(routes, heads):
     print(info_dict)
 
     # send the dict to serial
-    # ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
-    # time.sleep(2)
-    # json_string = json.dumps(info_dict) + '\n'
-    # ser.write(json_string.encode())
-    # ser.close()
+    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=None)
+    time.sleep(2)
+    json_string = json.dumps(info_dict) + '\n'
+    ser.write(json_string.encode())
+    ser.close()
 
 
 if __name__ == '__main__':
