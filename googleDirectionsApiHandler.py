@@ -91,20 +91,19 @@ def getInfoAndSendItToSerial2(routes, heads):
     time.sleep(3)
     estTimes2, summaries2 = getEstimations(key, ori2, dest2)
 
-    # take a log (now, the file name is fixed)
+    # take a log (the file name is fixed)
     writeLog(estTimes1, summaries1, estTimes2, summaries2)
 
-    # '' is added when the length of the list is not 3 in
-    # writeLog()
-    # because what I use is passing reference, it comes back
-    # here and line display could be "16, 18,"
-    # remove it again
+    # the list (return values from getEstimations()) length is adjusted
+    # to 3 with '' in writeLog().
+    # if the filling happens, unnecessary "," is added at the end like,
+    # "16, 18,"
+    # remove the '' in the list
     for _ in range(estTimes1.count('')):
         estTimes1.remove('')
     for _ in range(estTimes2.count('')):
         estTimes2.remove('')
 
-    # row_1 = ["RouteNow", "r1"]
     row_1 = ["DriveNow", "t1"]
     row_2 = heads[0] + ','.join(estTimes1)
     row_3 = heads[1] + ','.join(estTimes2)
@@ -126,9 +125,9 @@ if __name__ == '__main__':
     # getInfoAndSendItToSerial2(('s1', 's2'))
     getInfoAndSendItToSerial2(('s3', 's4'), ('B:', 'L:'))
     #
-    #key = credict['api_key']
-    #ori, dest1 = credict['s1']
-    #dest1, dest2 = credict['s2']
-    #getEstimations(key, ori, dest1)
-    #getEstimations(key, dest1, dest2)
+    # key = credict['api_key']
+    # ori, dest1 = credict['s1']
+    # dest1, dest2 = credict['s2']
+    # getEstimations(key, ori, dest1)
+    # getEstimations(key, dest1, dest2)
     # pass
