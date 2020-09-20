@@ -23,22 +23,22 @@ def timeStampFull():
     return now.strftime('%d%b%Y-%H:%M:%S')
 
 
-def writeLog(t1, s1, t2, s2):
-    log_file = './googleDirections_log1.csv'
+def writeLog(t1, s1, t2, s2, mode):
+    log_file = './googleDirections_log_ver2.csv'
     # fill element if the lists are shorter
     # t1 and s1, t2 and s2 should have the same lengths
-    for _ in range(3 - len(t1)):
+    for _ in range(4 - len(t1)):
         t1.append('')  # just append blank
         s1.append('')
     # do the same for the set 2
-    for _ in range(3 - len(t2)):
+    for _ in range(4 - len(t2)):
         t2.append('')  # just append blank
         s2.append('')
 
     # print
     # full ts, ts, t1 (3 cells), s1 (3 cells), t2 (3 cells), s2 (3 cells)
     # line construction
-    line = [timeStampFull(), timeStamp()]
+    line = [timeStampFull(), timeStamp(), mode]
     for list_ in (t1, s1, t2, s2):
         line.append('\t'.join(list_))
 
@@ -46,16 +46,25 @@ def writeLog(t1, s1, t2, s2):
         LOG.write('\t'.join(line) + '\n')
 
 
-def getEstimations(key, point1, point2):
+def getEstimations(key, point1, point2, mode):
     # url construction
     # API  parameters
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     url += 'origin=place_id:' + point1
     url += '&destination=place_id:' + point2
-    url += '&mode=driving&departure_time=now&alternatives=true'
+    url += '&mode=' + mode
+    url += '&departure_time=now&alternatives=true'
     url += '&key=' + key
 
+    print(url)
+
     req = urllib.request.Request(url, method='GET')
+
+    # parse key control
+    if mode == 'driving':
+        key_to_see = 'duration_in_traffic'
+    else:  # transit
+        key_to_see = 'duration'
 
     with urllib.request.urlopen(req) as res:
         body1 = res.read()
@@ -69,7 +78,7 @@ def getEstimations(key, point1, point2):
         estimations = []
         summaries = []
         for d in res_dict['routes']:
-            estimation = d['legs'][0]['duration_in_traffic']['text']
+            estimation = d['legs'][0][key_to_see]['text']
             estimation = estimation.split(' ')[0]
             summary = d['summary']
             estimations.append(estimation)
@@ -80,31 +89,25 @@ def getEstimations(key, point1, point2):
     return estimations, summaries
 
 
-def getInfoAndSendItToSerial2(routes, heads):
-    # for now, routes = ('s1', 's2')
-    # # stretch(stop)1, stretch(stop)2
+def getInfoAndSendItToSerial2(routes, heads, driving):
     key = credict['api_key']
     ori1, dest1 = credict[routes[0]]
     ori2, dest2 = credict[routes[1]]
+    print("bool driving:", driving)
+    if driving:
+        mode = 'driving'
+    else:
+        mode = 'transit'
 
-    estTimes1, summaries1 = getEstimations(key, ori1, dest1)
+    estTimes1, summaries1 = getEstimations(key, ori1, dest1, mode)
     time.sleep(3)
-    estTimes2, summaries2 = getEstimations(key, ori2, dest2)
+    estTimes2, summaries2 = getEstimations(key, ori2, dest2, mode)
 
-    # take a log (the file name is fixed)
-    writeLog(estTimes1, summaries1, estTimes2, summaries2)
-
-    # the list (return values from getEstimations()) length is adjusted
-    # to 3 with '' in writeLog().
-    # if the filling happens, unnecessary "," is added at the end like,
-    # "16, 18,"
-    # remove the '' in the list
-    for _ in range(estTimes1.count('')):
-        estTimes1.remove('')
-    for _ in range(estTimes2.count('')):
-        estTimes2.remove('')
-
-    row_1 = ["DriveNow", "t1"]
+    if driving:
+        code = 'dr'
+    else:
+        code = 'tr'
+    row_1 = ['ETA Now', code]
     row_2 = heads[0] + ','.join(estTimes1)
     row_3 = heads[1] + ','.join(estTimes2)
     row_4 = timeStamp()
@@ -120,10 +123,13 @@ def getInfoAndSendItToSerial2(routes, heads):
     ser.write(json_string.encode())
     ser.close()
 
+    # take a log (the file name is fixed)
+    writeLog(estTimes1, summaries1, estTimes2, summaries2, mode)
+
 
 if __name__ == '__main__':
     # getInfoAndSendItToSerial2(('s1', 's2'))
-    getInfoAndSendItToSerial2(('s3', 's4'), ('B:', 'L:'))
+    getInfoAndSendItToSerial2(('s3', 's4'), ('B:', 'L:'), False)
     #
     # key = credict['api_key']
     # ori, dest1 = credict['s1']
