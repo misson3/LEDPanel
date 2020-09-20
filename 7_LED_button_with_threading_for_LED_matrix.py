@@ -117,11 +117,11 @@ class CallBack:
         print("Program Gray while loop Starts")
 
         i = 0
-        driving = True
+        driving = False
         while True:
-            # if i % 300 == 0:  # alternative way to execute every 5 min
-            if i % 150 == 0:  # alternate bus_train and driving
-                driving = not driving
+            if i % 300 == 0:  # alternative way to execute every 5 min
+            # if i % 150 == 0:  # alternate bus_train and driving
+                # driving = not driving
                 # was to call bus info ('gray'), display pattern
                 # busInfoHandler.getInfoAndSendItToSerial2('gray')
                 # call googleDirections
