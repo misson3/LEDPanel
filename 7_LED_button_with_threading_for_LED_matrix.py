@@ -45,9 +45,9 @@ class CallBack:
         GPIO.add_event_callback(self.green_btn_pin, self.setProgramStatus)
         GPIO.add_event_callback(self.red_btn_pin, self.setProgramStatus)
         # initialize program status: keep only 1 is active all the time
-        self.gray_active = 1
-        self.blue_active = 0
-        self.green_active = 0
+        self.gray_active = 1  # google Directions API
+        self.blue_active = 0  # haya2 Start 3B2 first to use this
+        self.green_active = 0  # bus
         self.red_active = 0
 
         # LED pin setup

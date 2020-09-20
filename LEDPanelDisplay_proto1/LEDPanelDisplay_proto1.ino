@@ -24,9 +24,9 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false, 64);
 // test json
 // {'bus': [1, 'stopid', 'busnum', '01 min', 'G', '11 mins', 'G', '17 mins', 'G']}
 // {'bus': [2, 'stopid', 'busnum', ['01', 'G', '11', 'G', '17', 'G'], // the bus stop
-//                              ['Ar', 'G', '08', 'Y', '10', 'R'], // aft Yew tee
+//                              ['Ar', 'G', '08', 'Y', '10', 'R'], // aft the station
 //                              ['Le', 'O', '12', 'G', '19', 'Y'], // aft the bus stop
-//                              ['dash3', 'shash2']
+//                              ['dash3', 'slash2']
 // {'bus': [2, 'BusNow', 'DP1', ['L1', 'G', 'L2', 'G', 'L3', 'G'], ['B1', 'G', 'B2', 'Y', 'B3', 'R'], ['A1', 'O', 'A2', 'G', 'A3', 'Y'], [3,3]]}
 // {'bus': [2, 'BusNow', 'DP2', ['01', 'G', '08', 'G', '12', 'G'], ['Ar', 'G', '15', 'Y', '18', 'R'], ['03', 'O', '09', 'G', '14', 'Y'], [3,1]]}
 // {"haya2":[1, "+1879d", "251571.33", "x1000 km"]}
@@ -68,7 +68,7 @@ void loop() {
     // some will be undef
     // if this is python, it will give an error
     int bus = doc["bus"][0];
-    String disp = doc["bus"][2];  // ------------------- Feb23
+    String disp = doc["bus"][2];  // ----- Feb23
     int haya2 = doc["haya2"][0];
     int red = doc["red"][0];
     int route = doc["route"][0];  // ----- Sep06, 2020
@@ -79,7 +79,7 @@ void loop() {
     } else if (bus == 2) {
       Serial.println("json for bus arrival 2");
       displayBus2(doc);
-      underline(disp);  // ---------------------------- Feb23
+      underline(disp);  // ----- Feb23
     } else if (haya2 == 1) {
       Serial.println("json for haya2");
       displayHaya2(doc);
